@@ -85,8 +85,10 @@ BrainVision EEG files are a common format for storing EEG data. BrainVision spli
 
 - `mne.io.read_raw_brainvision()`: Reads the `.vhdr` file and automatically finds the associated `.eeg` in the same folder. Then, it creates an MNE Raw obhect saved as "raw" that contains the EEG data and metadata. It also reads the event markers from the `.vmrk` files. 
 
-What to choose `preload=True` or `preload=False`?
+**What to choose `preload=True` or `preload=False`?**
+
 - `preload=True`: Loads the entire EEG data into memory (RAM) immediately. This allows for faster access and manipulation of the data later on, but it requires sufficient RAM to hold the entire dataset. For large datasets, this may not be feasible.
+
 - `preload=False`: Loads only the metadata and structure of the EEG data, without loading the actual voltage numbers into memory. This is more memory-efficient, but accessing the data later will be slower, as it will need to **read from disk each time**. This is useful for very large datasets that cannot fit into RAM.
 
 "Reading from disk each time" means Python has to repeatedly perform physical read operations on your storage device whenever you ask to look at or analyze a chunk of signal, rather than keeping the entire dataset pre-loaded as RAM.
