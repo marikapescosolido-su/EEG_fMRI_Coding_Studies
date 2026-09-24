@@ -1,14 +1,14 @@
 ---
-title: "Your Research Paper Title"
-subtitle: "A clear, one-sentence description of the project"
+title: "Simultaneous EEG and fMRI data analysis"
+subtitle: "Understanding the code and methods for analyzing simultaneous EEG and fMRI data"
 author: "Marika Pescosolido"
 date: last-modified
 abstract: |
-  Replace this text with a short summary of the question, method, and main result.
+  Understanding how to use Python to analyze simultaneous EEG and fMRI data. This document provides a comprehensive guide to the methods, code, and best practices for analyzing such data, with a focus on psychosis research.
 keywords:
-  - keyword one
-  - keyword two
-  - keyword three
+  - EEG
+  - fMRI
+  - Psychosis
 ---
 
 <!--
@@ -19,23 +19,8 @@ AUTHORING GUIDE
 4. Change it to true only when your local or GitHub environment has the required packages.
 -->
 
-# Research question
 
-State the question your work answers in one or two sentences.
-
-::: {.callout-note title="Main question"}
-Write the precise research question here.
-:::
-
-# Background
-
-Introduce the scientific or technical context. Define important terms and add equations when useful:
-
-$$
-y = f(x; \theta).
-$$
-
-# Method
+# Loading EEG and first processing features
 
 Describe the method before presenting its implementation. Use subsections to keep a longer workflow easy to navigate.
 
@@ -48,42 +33,11 @@ Explain what this step does and why it is needed.
 import numpy as np
 ```
 
-## Step 2: Prepare the data
 
-Write the instruction for the reader, followed by the corresponding code.
 
-```{python}
-# Replace this example with your data-loading code.
-x = np.linspace(0, 1, 100)
-```
-
-## Step 3: Build and run the model
-
-Document the important decisions, assumptions, and parameters.
 
 ```{python}
-# Add model or analysis code here.
-def model(x):
-    return x**2
+# Add imports or setup code here.
+import numpy as np
 ```
-
-# Results
-
-Summarize the output and add figures or tables here.
-
-::: {.callout-tip title="Adding a figure"}
-Save an image in an `images/` folder, then insert it with `![Caption](images/your-figure.png)`.
-:::
-
-# Discussion
-
-Explain what the result means, where the method is limited, and what you would try next.
-
-# Reproducibility
-
-List the software versions, random seeds, data sources, and any other details needed to reproduce the work.
-
-# References
-
-Add references as Markdown links, or connect a BibTeX file later with `bibliography: references.bib` in the document header.
 
