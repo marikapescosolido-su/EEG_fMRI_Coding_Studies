@@ -96,3 +96,34 @@ BrainVision EEG files are a common format for storing EEG data. BrainVision spli
 "Reading from disk each time" means Python has to **repeatedly perform physical read operations on your storage device** whenever you ask to look at or analyze a chunk of signal, rather than keeping the entire dataset pre-loaded as RAM.
 
 - `print(raw.info)`: Displays a metadata summary of the EEG recording, including the number of channels, sampling rate, channel types, and other relevant information.
+
+## Step 3: Extract raw numerical values as a 2D NumPy array: [Channels x Timepoints]
+
+```{python}
+data, times = raw.get_data(return_times=True)
+
+print("\n--- DATA ARRAY DETAILS ---")
+print(f"Data array shape: {data.shape}  --> ({data.shape[0]} channels, {data.shape[1]:,} timepoints)")
+print(f"Sampling frequency: {raw.info['sfreq']} Hz")
+print(f"Total recording time: {times[-1] / 60:.2f} minutes")
+```
+
+## Step 4: Inspect a snippet of raw voltage data (in Volts; multiply by 1e6 for microvolts)
+
+
+```{python}
+first_channel_name = raw.ch_names[0]
+first_5_samples_uV = data[0, :5] * 1e6
+print(f"\nFirst 5 samples for channel '{first_channel_name}' (in µV):")
+print(first_5_samples_uV)
+```
+
+
+## Step 5: Plot the comtinous EEG traces
+
+```{python}
+raw.plot(duration=10, n_channels=20, scalings='auto')
+plt.show()
+print("\nEEG traces plotted. Close the plot window to continue.")
+```
+
