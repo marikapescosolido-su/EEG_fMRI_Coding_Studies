@@ -1,0 +1,67 @@
+:root {
+  --paper-ink: #243247;
+  --paper-muted: #64748b;
+  --paper-accent: #245f86;
+  --paper-tint: #edf5f8;
+}
+
+body {
+  color: var(--paper-ink);
+  line-height: 1.72;
+}
+
+.quarto-title-block .quarto-title-banner {
+  background: linear-gradient(135deg, #173b57 0%, #276f88 100%);
+  color: #fff;
+  padding-block: 3rem;
+}
+
+.quarto-title-block .quarto-title-banner .description,
+.quarto-title-block .quarto-title-banner .subtitle,
+.quarto-title-block .quarto-title-banner .quarto-title-meta {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+#quarto-document-content {
+  max-width: 880px;
+}
+
+h1,
+h2,
+h3 {
+  color: #173b57;
+  letter-spacing: -0.018em;
+}
+
+h2 {
+  border-bottom: 1px solid #dbe5ea;
+  padding-bottom: 0.35rem;
+}
+
+a {
+  color: var(--paper-accent);
+}
+
+pre.sourceCode {
+  border: 1px solid #d8e3e8;
+  border-radius: 0.55rem;
+}
+
+.callout.callout-style-default {
+  border-radius: 0.55rem;
+}
+
+#TOC {
+  font-size: 0.92rem;
+}
+
+.nav-footer {
+  border-top: 1px solid #e2e8f0;
+}
+
+@media (max-width: 991.98px) {
+  #quarto-document-content {
+    max-width: 100%;
+  }
+}
+

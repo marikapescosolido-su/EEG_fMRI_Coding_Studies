@@ -1,0 +1,42 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Research Coding Notes"
+  site-url: "https://marikapescosolido-su.github.io/pinn-bbb-permeability/"
+  repo-url: "https://github.com/marikapescosolido-su/pinn-bbb-permeability"
+  repo-actions: [edit, issue]
+  navbar:
+    left:
+      - href: index.qmd
+        text: Paper
+    right:
+      - icon: github
+        href: "https://github.com/marikapescosolido-su/pinn-bbb-permeability"
+        aria-label: GitHub
+  page-footer:
+    left: "Built with Quarto"
+    right: "© Marika Pescosolido"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    toc-title: Contents
+    toc-depth: 3
+    toc-location: right
+    number-sections: true
+    smooth-scroll: true
+    code-fold: show
+    code-summary: "Show code"
+    code-tools: true
+    code-line-numbers: true
+    code-copy: true
+    highlight-style: github
+    link-external-newwindow: true
+
+execute:
+  enabled: false
+
