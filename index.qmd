@@ -130,7 +130,10 @@ data = np.array([
 
 When the developers created the MNE library, they designed the `raw.get_data()` function to return two specific outputs: the first output is always the raw voltage data, and the second output is always the corresponding time values. This is a standard convention in MNE, so when you call `raw.get_data(return_times=True)`, it knows to return both the data and the times in that order.
 
-- `.shape` 
+- `.shape`: Returns the dimensions of the `data` array, which is useful for understanding how many channels and timepoints are present in the EEG recording. It prints:
+  - `data.shape[0]`: The number of channels (rows in the array)
+  - `data.shape[1]`: The number of timepoints (columns in the array)
+
 
 
 ## Step 4: Inspect a snippet of raw voltage data (in Volts; multiply by 1e6 for microvolts)
