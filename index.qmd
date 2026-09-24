@@ -45,6 +45,10 @@ Set up the coding environment by importing the necessary libraries and packages.
 
 - MNE: A Python package for processing EEG and MEG data. Raw EEG files (like .vhdr, .edf, or .bdf) carry metadata—channel labels, sampling rates, filter settings, and electrode locations. MNE provides specialized functions to read these complex formats, extract raw signals, scale microvolts, and plot scalp maps or traces easily.
 
+-NumPy: A fundamental package for numerical computing in Python. EEG data is fundamentally a massive 2D matrix of numbers: Channels×Timepoints. While MNE manages the metadata, under the hood it stores the actual voltage numbers inside NumPy arrays so you can perform fast matrix arithmetic.
+
+- Matplotlib: A widely used Python library for plottoing (e.g., EEG traces, scalp maps, and other visual representations of the data). Note that "TkAgg" is a backend for Matplotlib that allows for interactive plotting in a separate window (e.g. raw.plot() opens a new window with the EEG traces with interactive scrolling/zooming features).
+
 ```{python}
 import mne
 import numpy as np
