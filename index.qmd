@@ -41,11 +41,19 @@ EEG-fMRI analysis approaches:
 # Loading EEG and first processing features
 ## Step 1: Set up the environment
 
+Set up the coding environment by importing the necessary libraries and packages. This includes:
 
+- MNE: A Python package for processing EEG and MEG data. Raw EEG files (like .vhdr, .edf, or .bdf) carry metadata—channel labels, sampling rates, filter settings, and electrode locations. MNE provides specialized functions to read these complex formats, extract raw signals, scale microvolts, and plot scalp maps or traces easily.
 
 ```{python}
-# Add imports or setup code here.
+import mne
 import numpy as np
+
+import matplotlib
+# Force an interactive window backend for Windows/VS Code
+matplotlib.use('TkAgg')
+
+import matplotlib.pyplot as plt
 ```
 
 
