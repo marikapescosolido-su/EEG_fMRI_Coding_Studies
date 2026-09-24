@@ -20,10 +20,25 @@ AUTHORING GUIDE
 -->
 
 
+
+# Introduction
+
+Studies using EEG and fMRI have shown that fusion of these two modelities produces new insights into brain fucntions and synamics that would not be possible with either modality alone. The combination of EEG and fMRI allows for the simultaneous measurement of both electrical activity and hemodynamic (blood flow) responses in the brain, providing a more comprehensive understanding of neural processes. In this document I will focus on understanding how to uncover nonlinear relationships between EEG and fMRI data, and how to use Python to analyze such data.
+
+# Background knowledge
+
+EEG and fMRI data complement one another in terms of their temporal and spatial resolution. The first allows an accurate measurement of electrical activity, whereas the second allows for its precise localization in the brain. What makes the simultaneous acquisition of EEG and fMRI still challenging is not the data collecrion process, but rather the lack of appropriate methods for data fusion (asymmetric and symmetric).
+
+- Asymmetric methods: The results of one modality guide the analysis of the other.
+- Symmetric methods: Both modalities are analyzed together.
+
+EEG-fMRI analysis approaches:
+
+- Model-driven:
+- Data-driven:
+
+
 # Loading EEG and first processing features
-
-Literature review: Studies using EEG and fMRI have shown that fusion of these two modelities produces new insights into brain fucntions and synamics that would not be possible with either modality alone. The combination of EEG and fMRI allows for the simultaneous measurement of both electrical activity and hemodynamic (blood flow) responses in the brain, providing a more comprehensive understanding of neural processes. In this document I will focus on understanding how to uncover nonlinear relationships between EEG and fMRI data, and how to use Python to analyze such data.
-
 ## Step 1: Set up the environment
 
 
