@@ -4,8 +4,8 @@ project:
 
 website:
   title: "Research Coding Notes"
-  site-url: "https://marikapescosolido-su.github.io/pinn-bbb-permeability/"
-  repo-url: "https://github.com/marikapescosolido-su/pinn-bbb-permeability"
+  site-url: "https://marikapescosolido-su.github.io/EEG_fMRI_Coding_Studies/"
+  repo-url: "https://github.com/marikapescosolido-su/EEG_fMRI_Coding_Studies"
   repo-actions: [edit, issue]
   navbar:
     left:
