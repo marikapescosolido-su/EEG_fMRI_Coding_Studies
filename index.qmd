@@ -87,6 +87,8 @@ BrainVision EEG files are a common format for storing EEG data. BrainVision spli
 
 What to choose `preload=True` or `preload=False`?
 - `preload=True`: Loads the entire EEG data into memory (RAM) immediately. This allows for faster access and manipulation of the data later on, but it requires sufficient RAM to hold the entire dataset. For large datasets, this may not be feasible.
-- `preload=False`: Loads only the metadata and structure of the EEG data, without loading the actual voltage numbers into memory. This is more memory-efficient, but accessing the data later will be slower, as it will need to read from disk each time. This is useful for very large datasets that cannot fit into RAM.
+- `preload=False`: Loads only the metadata and structure of the EEG data, without loading the actual voltage numbers into memory. This is more memory-efficient, but accessing the data later will be slower, as it will need to **read from disk each time**. This is useful for very large datasets that cannot fit into RAM.
+
+"Reading from disk each time" means Python has to repeatedly perform physical read operations on your storage device whenever you ask to look at or analyze a chunk of signal, rather than keeping the entire dataset pre-loaded as RAM.
 
 - `print(raw.info)`: Displays a metadata summary of the EEG recording, including the number of channels, sampling rate, channel types, and other relevant information.
