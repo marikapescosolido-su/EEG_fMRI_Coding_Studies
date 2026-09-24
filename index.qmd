@@ -55,11 +55,13 @@ import matplotlib.pyplot as plt
 
 Set up the coding environment by importing the necessary libraries and packages. This includes:
 
-- MNE: A Python package for processing EEG and MEG data. Raw EEG files (like .vhdr, .edf, or .bdf) carry metadata—channel labels, sampling rates, filter settings, and electrode locations. MNE provides specialized functions to read these complex formats, extract raw signals, scale microvolts, and plot scalp maps or traces easily.
+- **MNE:** A Python package for processing EEG and MEG data. Raw EEG files (like .vhdr, .edf, or .bdf) carry metadata—channel labels, sampling rates, filter settings, and electrode locations. MNE provides specialized functions to read these complex formats, extract raw signals, scale microvolts, and plot scalp maps or traces easily.
 
-- NumPy: A fundamental package for numerical computing in Python. EEG data is fundamentally a massive 2D matrix of numbers: Channels×Timepoints. While MNE manages the metadata, under the hood it stores the actual voltage numbers inside NumPy arrays so you can perform fast matrix arithmetic.
+- **NumPy:** A fundamental package for numerical computing in Python. EEG data is fundamentally a massive 2D matrix of numbers: Channels×Timepoints. While MNE manages the metadata, under the hood it stores the actual voltage numbers inside NumPy arrays so you can perform fast matrix arithmetic.
 
-- Matplotlib: A widely used Python library for plottoing (e.g., EEG traces, scalp maps, and other visual representations of the data). Note that "TkAgg" is a backend for Matplotlib that allows for interactive plotting in a separate window (e.g. raw.plot() opens a new GUI window with the EEG traces with interactive scrolling/zooming features).
+- **Matplotlib:** A widely used Python library for plottoing (e.g., EEG traces, scalp maps, and other visual representations of the data). Note that "TkAgg" is a backend for Matplotlib that allows for interactive plotting in a separate window (e.g. raw.plot() opens a new GUI window with the EEG traces with interactive scrolling/zooming features).
+
+## Step 2: Load the EEG data
 
 ```{python}
 # Update this path if your folder structure differs slightly
@@ -91,6 +93,6 @@ BrainVision EEG files are a common format for storing EEG data. BrainVision spli
 
 - `preload=False`: Loads only the metadata and structure of the EEG data, without loading the actual voltage numbers into memory. This is more memory-efficient, but accessing the data later will be slower, as it will need to **read from disk each time**. This is useful for very large datasets that cannot fit into RAM.
 
-"Reading from disk each time" means Python has to repeatedly perform physical read operations on your storage device whenever you ask to look at or analyze a chunk of signal, rather than keeping the entire dataset pre-loaded as RAM.
+"Reading from disk each time" means Python has to **repeatedly perform physical read operations on your storage device** whenever you ask to look at or analyze a chunk of signal, rather than keeping the entire dataset pre-loaded as RAM.
 
 - `print(raw.info)`: Displays a metadata summary of the EEG recording, including the number of channels, sampling rate, channel types, and other relevant information.
