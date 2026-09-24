@@ -13,7 +13,7 @@ website:
         text: Paper
     right:
       - icon: github
-        href: "https://github.com/marikapescosolido-su/pinn-bbb-permeability"
+        href: "https://github.com/marikapescosolido-su/EEG_fMRI_Coding_Studies"
         aria-label: GitHub
   page-footer:
     left: "Built with Quarto"
