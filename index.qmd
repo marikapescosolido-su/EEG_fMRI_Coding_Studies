@@ -22,11 +22,11 @@ AUTHORING GUIDE
 
 # Loading EEG and first processing features
 
-Describe the method before presenting its implementation. Use subsections to keep a longer workflow easy to navigate.
+Literature review: Studies using EEG and fMRI have shown that fusion of these two modelities produces new insights into brain fucntions and synamics that would not be possible with either modality alone. The combination of EEG and fMRI allows for the simultaneous measurement of both electrical activity and hemodynamic (blood flow) responses in the brain, providing a more comprehensive understanding of neural processes. In this document I will focus on understanding how to uncover nonlinear relationships between EEG and fMRI data, and how to use Python to analyze such data.
 
 ## Step 1: Set up the environment
 
-Explain what this step does and why it is needed.
+
 
 ```{python}
 # Add imports or setup code here.
