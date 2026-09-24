@@ -23,11 +23,11 @@ AUTHORING GUIDE
 
 # Introduction
 
-Studies using EEG and fMRI have shown that fusion of these two modelities produces new insights into brain fucntions and synamics that would not be possible with either modality alone. The combination of EEG and fMRI allows for the simultaneous measurement of both electrical activity and hemodynamic (blood flow) responses in the brain, providing a more comprehensive understanding of neural processes. In this document I will focus on understanding how to uncover nonlinear relationships between EEG and fMRI data, and how to use Python to analyze such data.
+Studies using EEG and fMRI have shown that fusion of these two modelities produces new insights into brain functions and dynamics that would not be possible with either modality alone. The combination of EEG and fMRI allows for the simultaneous measurement of both electrical activity and hemodynamic (blood flow) responses in the brain, providing a more comprehensive understanding of neural processes. In this document I will focus on understanding how to uncover nonlinear relationships between EEG and fMRI data, and how to use Python to analyze such data.
 
 # Background knowledge
 
-EEG and fMRI data complement one another in terms of their temporal and spatial resolution. The first allows an accurate measurement of electrical activity, whereas the second allows for its precise localization in the brain. What makes the simultaneous acquisition of EEG and fMRI still challenging is not the data collecrion process, but rather the lack of appropriate methods for data fusion (asymmetric and symmetric).
+EEG and fMRI data complement one another in terms of their temporal and spatial resolution. The first allows an accurate measurement of electrical activity, whereas the second allows for its precise localization in the brain. What makes the simultaneous acquisition of EEG and fMRI still challenging is not the data collection process, but rather the lack of appropriate methods for data fusion (asymmetric and symmetric).
 
 - Asymmetric methods: The results of one modality guide the analysis of the other.
 - Symmetric methods: Both modalities are analyzed together.
@@ -39,15 +39,8 @@ EEG-fMRI analysis approaches:
 
 
 # Loading EEG and first processing features
-## Step 1: Set up the environment
 
-Set up the coding environment by importing the necessary libraries and packages. This includes:
-
-- MNE: A Python package for processing EEG and MEG data. Raw EEG files (like .vhdr, .edf, or .bdf) carry metadata—channel labels, sampling rates, filter settings, and electrode locations. MNE provides specialized functions to read these complex formats, extract raw signals, scale microvolts, and plot scalp maps or traces easily.
-
--NumPy: A fundamental package for numerical computing in Python. EEG data is fundamentally a massive 2D matrix of numbers: Channels×Timepoints. While MNE manages the metadata, under the hood it stores the actual voltage numbers inside NumPy arrays so you can perform fast matrix arithmetic.
-
-- Matplotlib: A widely used Python library for plottoing (e.g., EEG traces, scalp maps, and other visual representations of the data). Note that "TkAgg" is a backend for Matplotlib that allows for interactive plotting in a separate window (e.g. raw.plot() opens a new window with the EEG traces with interactive scrolling/zooming features).
+## Step 1: Set up the coding environment
 
 ```{python}
 import mne
@@ -60,11 +53,31 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 ```
 
+Set up the coding environment by importing the necessary libraries and packages. This includes:
 
+- MNE: A Python package for processing EEG and MEG data. Raw EEG files (like .vhdr, .edf, or .bdf) carry metadata—channel labels, sampling rates, filter settings, and electrode locations. MNE provides specialized functions to read these complex formats, extract raw signals, scale microvolts, and plot scalp maps or traces easily.
 
+- NumPy: A fundamental package for numerical computing in Python. EEG data is fundamentally a massive 2D matrix of numbers: Channels×Timepoints. While MNE manages the metadata, under the hood it stores the actual voltage numbers inside NumPy arrays so you can perform fast matrix arithmetic.
+
+- Matplotlib: A widely used Python library for plottoing (e.g., EEG traces, scalp maps, and other visual representations of the data). Note that "TkAgg" is a backend for Matplotlib that allows for interactive plotting in a separate window (e.g. raw.plot() opens a new GUI window with the EEG traces with interactive scrolling/zooming features).
 
 ```{python}
-# Add imports or setup code here.
-import numpy as np
+# Update this path if your folder structure differs slightly
+vhdr_path = r"C:\Users\mpescosolido3\Downloads\ds006033 dataset\sub-01\ses-02\eeg\sub-01_ses-02_task-innerspeech_eeg.vhdr"
+
+print("Loading BrainVision EEG header...")
+# Read the header (.vhdr) file which loads the 1.29GB .eeg binary
+raw = mne.io.read_raw_brainvision(vhdr_path, preload=True)
+
+print("\n--- EEG INFO ---")
+print(raw.info)
 ```
+
+BrainVision EEG files are a common format for storing EEG data. BrainVision splits the dataset across three separate files:
+
+- `.vhdr` file: Small text file containing metadata about the EEG recording, such as sampling rate, channel names, units, electrode locations, and pointers to the raw data files. 
+
+- `.eeg` file: Large binary file containing the actual voltage numbers measured at each electrode over time. This file can be several gigabytes in size, depending on the length of the recording and the number of channels.
+
+- `.vmrk` file: Small text file containing event markers, which indicate when specific stimuli or events occurred during the EEG recording. These markers are crucial for aligning EEG data with experimental events.
 
