@@ -157,11 +157,23 @@ print("\nEEG traces plotted. Close the plot window to continue.")
 
 
 
-#-	CCA – fMRI and EEG have diff. temporal resolution. Time delay embedding? Where is the CCA peak correlation? What is the optimal time offset? Do a loop of CCA as a function. 
--	How to estimate eigenvectors without diagonal.
--	2024 Paper
--	Take eeg 3 sec before fmri do cca analysis and look how the correlation decays with adding number of components. Uusally you need at least 2 secoidn, 1 one is arousoursl and the second one is the rest of arousal.
--	In literature they often use 6 seconds for the offset. 6 sec from the eeg removed to balance things out.
--	Multi-set CCA.
--	What is the motivation to use CCA as a first step? Why are we not using joint-CCA (things with different units in the same space unless you are trying to understand wjat is shared between them). CCA linear. 
--	Do not use the standard CCA implementation, but rather CCA.zoo. The standard one is using an algorithm that is trying to use the inverse as a whole (multiple folds slower) and it fsils if your dtaa Is very high dimension. Regulariszed cca – maybe better but still in the xoo library. 
+# Understand CCA
+
+## Considerations:
+- Account for different temporal resolutions: fMRI and EEG operate at different temporal resolutions. Consider using time-delay embedding to align them.
+- Estimate the optimal time offset: Run CCA across a range of EEG–fMRI time lags and identify where the canonical correlation peaks.
+- Test the expected hemodynamic delay: The literature often uses an offset of approximately 6 seconds. Remove or shift the corresponding EEG samples as needed to keep the datasets aligned and balanced.
+- Reproduce the 2024 paper’s analysis: Use EEG data from the 3 seconds preceding each fMRI observation, perform CCA, and examine how the correlation changes as the number of canonical components increases.
+- Number of components: At least two components are usually needed. One may capture arousal, while the second may capture the remaining arousal-related variance or other shared activity.
+- Consider multiset CCA: This may be appropriate if more than two datasets, subjects, or recording conditions are being analyzed.
+- Clarify the motivation for CCA: Explain why CCA is being used as an initial step and why joint CCA is not preferred. CCA is a linear method designed to identify shared structure between datasets with different units or feature spaces.
+- Eigenvector estimation: Determine how to estimate the eigenvectors without explicitly forming or inverting the full diagonal/covariance matrix.
+- Implementation: Avoid the standard CCA implementation. It attempts to invert the full covariance structure, making it much slower and prone to failure with very high-dimensional data. Use the CCA-Zoo library instead.
+- Regularization: Regularized CCA may be more stable for high-dimensional data and is also available in CCA-Zoo.
+
+# What is CCA?
+CCA (Canonical Correlation Analysis) is a statistical method used to explore the relationships between two sets of variables (vectors). It identifies pairs of **canonical variables** (linear combinations of the original variables) that are **maximally correlated** with each other. 
+
+In the context of EEG and fMRI data analysis, CCA can be used to uncover shared patterns of activity between the two modalities, despite their different temporal and spatial resolutions.
+
+
