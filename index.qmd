@@ -171,12 +171,12 @@ print("\nEEG traces plotted. Close the plot window to continue.")
 9. **Implementation**: Avoid the standard CCA implementation. It attempts to invert the full covariance structure, making it much slower and prone to failure with very high-dimensional data. Use the CCA-Zoo library instead.
 10. **Regularization**: Regularized CCA may be more stable for high-dimensional data and is also available in CCA-Zoo.
 
-# What is CCA?
+## What is CCA?
 CCA (Canonical Correlation Analysis) is a statistical method used to explore the relationships between two sets of variables (vectors). It identifies pairs of **canonical variables** (linear combinations of the original variables) that are **maximally correlated** with each other. 
 
 In the context of EEG and fMRI data analysis, CCA can be used to uncover shared patterns of activity between the two modalities, despite their different temporal and spatial resolutions.
 
-# What Makes the Canonical Variables Maximally Correlated?
+## What Makes the Canonical Variables Maximally Correlated?
 
 The important distinction is:
 
@@ -242,37 +242,191 @@ $$
 
 Thus, the word *maximally* refers to the process of searching over all permitted weight combinations.
 
-## Simple Example
+## How is the correlation defined?
 
-Imagine that the EEG dataset has two variables, $X_1$ and $X_2$, and the fMRI dataset has one variable, $Y_1$.
-
-Consider two possible EEG combinations:
+For fixed weights $a$ and $b$, their Pearson correlation is:
 
 $$
-U_1 = X_1
+\operatorname{corr}(U,V)
+=
+\frac{\operatorname{cov}(U,V)}
+{\sqrt{\operatorname{var}(U)\operatorname{var}(V)}}.
+$$
+
+Substituting $U= Xa$ and $V=Yb$ gives:
+
+$$
+\operatorname{corr}(Xa,Yb)
+=
+\frac{\operatorname{cov}(Xa,Yb)}
+{\sqrt{\operatorname{var}(Xa)\operatorname{var}(Yb)}}.
+$$
+
+The **maximum canonical correlation** is defined as:
+
+$$
+\rho_1
+=
+\max_{a,b}
+\operatorname{corr}(Xa,Yb).
+$$
+
+This means:
+
+1. Choose a possible EEG weight vector $a$.
+2. Choose a possible fMRI weight vector $b$.
+3. Calculate $U= Xa$ and $V=Yb$.
+4. Calculate the Pearson correlation between $U$ and $V$.
+5. Repeat for all permitted choices of $a$ and $b$.
+6. Keep the largest correlation.
+
+The optimal weights are:
+
+$$
+(a^\ast,b^\ast)
+=
+\underset{a,b}{\operatorname{arg\,max}}
+\operatorname{corr}(Xa,Yb).
+$$
+
+The maximum correlation is then:
+
+$$
+\rho_1
+=
+\operatorname{corr}(Xa^\ast,Yb^\ast).
+$$
+
+Here, $\operatorname{arg\,max}$ returns the weights that produce the maximum, whereas $\max$ returns the correlation value itself.
+
+### Definition Using Covariance Matrices
+
+Let:
+
+- $\Sigma_{XX}$ be the covariance matrix of $X$;
+- $\Sigma_{YY}$ be the covariance matrix of $Y$;
+- $\Sigma_{XY}$ be the cross-covariance matrix between $X$ and $Y$.
+
+Then:
+
+$$
+\operatorname{cov}(Xa,Yb)
+=
+a^\top\Sigma_{XY}b,
+$$
+
+$$
+\operatorname{var}(Xa)
+=
+a^\top\Sigma_{XX}a,
 $$
 
 and
 
 $$
-U_2 = 0.8X_1 + 0.6X_2.
+\operatorname{var}(Yb)
+=
+b^\top\Sigma_{YY}b.
 $$
 
-Suppose:
+Therefore, the maximum canonical correlation is:
 
 $$
-\operatorname{corr}(U_1,Y_1)=0.40
+\rho_1
+=
+\max_{a,b}
+\frac{
+a^\top\Sigma_{XY}b
+}{
+\sqrt{
+\left(a^\top\Sigma_{XX}a\right)
+\left(b^\top\Sigma_{YY}b\right)
+}
+}.
 $$
 
-but
+This is the formal definition of the first canonical correlation.
+
+### Equivalent Constrained Definition
+
+CCA can equivalently require the canonical variables to have unit variance:
 
 $$
-\operatorname{corr}(U_2,Y_1)=0.85.
+a^\top\Sigma_{XX}a=1
 $$
 
-The second weighted combination is more strongly correlated with the fMRI variable. CCA systematically searches for the weights that produce the greatest possible correlation.
+and
 
-## Why Scaling the Weights Does Not Increase Correlation
+$$
+b^\top\Sigma_{YY}b=1.
+$$
+
+It then solves:
+
+$$
+\rho_1
+=
+\max_{a,b}
+a^\top\Sigma_{XY}b
+$$
+
+subject to those two constraints.
+
+Because both canonical variables have variance equal to $1$, their covariance is equal to their correlation:
+
+$$
+\operatorname{corr}(Xa,Yb)
+=
+\operatorname{cov}(Xa,Yb).
+$$
+
+### In Terms of the Observed Values
+
+Suppose the canonical-variable vectors contain $n$ observations:
+
+$$
+U=(u_1,\ldots,u_n)^\top
+$$
+
+and
+
+$$
+V=(v_1,\ldots,v_n)^\top.
+$$
+
+Their sample correlation is:
+
+$$
+r(U,V)
+=
+\frac{
+\sum_{i=1}^{n}(u_i-\bar{u})(v_i-\bar{v})
+}{
+\sqrt{
+\sum_{i=1}^{n}(u_i-\bar{u})^2
+}
+\sqrt{
+\sum_{i=1}^{n}(v_i-\bar{v})^2
+}
+}.
+$$
+
+CCA selects $a$ and $b$ so that this quantity is as large as possible.
+
+The result satisfies:
+
+$$
+0 \leq \rho_1 \leq 1.
+$$
+
+A large value means that CCA found one weighted pattern in $X$ and one weighted pattern in $Y$ that change similarly across observations.
+
+::: {.callout-important}
+A large maximum correlation in the training data does not necessarily imply a strong relationship in new data. When the number of features is large relative to the number of observations, CCA can overfit and may even produce a training correlation close to $1$. The canonical correlation should therefore be evaluated on held-out data or with cross-validation.
+:::
+
+
+### Why Scaling the Weights Does Not Increase Correlation
 
 CCA cannot create a larger correlation simply by multiplying the weights by a large number because correlation is unaffected by positive rescaling:
 
