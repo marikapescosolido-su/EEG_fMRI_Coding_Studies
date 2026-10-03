@@ -160,16 +160,16 @@ print("\nEEG traces plotted. Close the plot window to continue.")
 # Understand CCA
 
 ## Considerations:
-- Account for different temporal resolutions: fMRI and EEG operate at different temporal resolutions. Consider using time-delay embedding to align them.
-- Estimate the optimal time offset: Run CCA across a range of EEG–fMRI time lags and identify where the canonical correlation peaks.
-- Test the expected hemodynamic delay: The literature often uses an offset of approximately 6 seconds. Remove or shift the corresponding EEG samples as needed to keep the datasets aligned and balanced.
-- Reproduce the 2024 paper’s analysis: Use EEG data from the 3 seconds preceding each fMRI observation, perform CCA, and examine how the correlation changes as the number of canonical components increases.
-- Number of components: At least two components are usually needed. One may capture arousal, while the second may capture the remaining arousal-related variance or other shared activity.
-- Consider multiset CCA: This may be appropriate if more than two datasets, subjects, or recording conditions are being analyzed.
-- Clarify the motivation for CCA: Explain why CCA is being used as an initial step and why joint CCA is not preferred. CCA is a linear method designed to identify shared structure between datasets with different units or feature spaces.
-- Eigenvector estimation: Determine how to estimate the eigenvectors without explicitly forming or inverting the full diagonal/covariance matrix.
-- Implementation: Avoid the standard CCA implementation. It attempts to invert the full covariance structure, making it much slower and prone to failure with very high-dimensional data. Use the CCA-Zoo library instead.
-- Regularization: Regularized CCA may be more stable for high-dimensional data and is also available in CCA-Zoo.
+1.  **Account for different temporal resolutions**: fMRI and EEG operate at different temporal resolutions. Consider using time-delay embedding to align them.
+2.  **Estimate the optimal time offset**: Run CCA across a range of EEG–fMRI time lags and identify where the canonical correlation peaks.
+3.  **Test the expected hemodynamic delay**: The literature often uses an offset of approximately 6 seconds. Remove or shift the corresponding EEG samples as needed to keep the datasets aligned and balanced.
+4.  **Reproduce the 2024 paper’s analysis**: Use EEG data from the 3 seconds preceding each fMRI observation, perform CCA, and examine how the correlation changes as the number of canonical components increases.
+5.  **Number of components**: At least two components are usually needed. One may capture arousal, while the second may capture the remaining arousal-related variance or other shared activity.
+6.  **Consider multiset CCA**: This may be appropriate if more than two datasets, subjects, or recording conditions are being analyzed.
+7. **Clarify the motivation for CCA**: Explain why CCA is being used as an initial step and why joint CCA is not preferred. CCA is a linear method designed to identify shared structure between datasets with different units or feature spaces.
+8. **Eigenvector estimation**: Determine how to estimate the eigenvectors without explicitly forming or inverting the full diagonal/covariance matrix.
+9. **Implementation**: Avoid the standard CCA implementation. It attempts to invert the full covariance structure, making it much slower and prone to failure with very high-dimensional data. Use the CCA-Zoo library instead.
+10. **Regularization**: Regularized CCA may be more stable for high-dimensional data and is also available in CCA-Zoo.
 
 # What is CCA?
 CCA (Canonical Correlation Analysis) is a statistical method used to explore the relationships between two sets of variables (vectors). It identifies pairs of **canonical variables** (linear combinations of the original variables) that are **maximally correlated** with each other. 
@@ -199,7 +199,8 @@ $$
 V = Yb,
 $$
 
-where $a$ and $b$ are vectors of weights.
+where $X$ and $Y$ are **data matrices**, while $a$ and $b$ are **weight vectors**.
+
 
 For example:
 
@@ -217,7 +218,7 @@ might be a linear combination of fMRI regions.
 
 $U$ is constructed only from EEG variables, and $V$ is constructed only from fMRI variables. Therefore, $U$ and $V$ are not automatically highly correlated.
 
-### What Does CCA Optimize?
+## What Does CCA Optimize?
 
 Different choices of the weights $a$ and $b$ produce different canonical variables and different correlations.
 
@@ -241,7 +242,7 @@ $$
 
 Thus, the word *maximally* refers to the process of searching over all permitted weight combinations.
 
-### Simple Example
+## Simple Example
 
 Imagine that the EEG dataset has two variables, $X_1$ and $X_2$, and the fMRI dataset has one variable, $Y_1$.
 
@@ -271,7 +272,7 @@ $$
 
 The second weighted combination is more strongly correlated with the fMRI variable. CCA systematically searches for the weights that produce the greatest possible correlation.
 
-### Why Scaling the Weights Does Not Increase Correlation
+## Why Scaling the Weights Does Not Increase Correlation
 
 CCA cannot create a larger correlation simply by multiplying the weights by a large number because correlation is unaffected by positive rescaling:
 
