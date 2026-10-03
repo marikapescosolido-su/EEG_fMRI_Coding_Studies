@@ -176,4 +176,137 @@ CCA (Canonical Correlation Analysis) is a statistical method used to explore the
 
 In the context of EEG and fMRI data analysis, CCA can be used to uncover shared patterns of activity between the two modalities, despite their different temporal and spatial resolutions.
 
+# What Makes the Canonical Variables Maximally Correlated?
 
+The important distinction is:
+
+> Each canonical variable is a linear combination of the variables **within its own dataset**. 
+
+Suppose we have two datasets:
+
+- $X$: EEG variables
+- $Y$: fMRI variables
+
+CCA constructs two new variables:
+
+$$
+U = Xa
+$$
+
+and
+
+$$
+V = Yb,
+$$
+
+where $a$ and $b$ are vectors of weights.
+
+For example:
+
+$$
+U = 0.7X_1 - 0.2X_2 + 0.5X_3
+$$
+
+might be a linear combination of EEG channels, while
+
+$$
+V = 0.4Y_1 + 0.8Y_2 - 0.1Y_3
+$$
+
+might be a linear combination of fMRI regions.
+
+$U$ is constructed only from EEG variables, and $V$ is constructed only from fMRI variables. Therefore, $U$ and $V$ are not automatically highly correlated.
+
+### What Does CCA Optimize?
+
+Different choices of the weights $a$ and $b$ produce different canonical variables and different correlations.
+
+CCA searches for the weights that solve:
+
+$$
+(a^\ast,b^\ast)
+=
+\underset{a,b}{\operatorname{arg\,max}}
+\;
+\operatorname{corr}(Xa,Yb).
+$$
+
+The resulting maximum correlation is:
+
+$$
+\rho_1
+=
+\operatorname{corr}(Xa^\ast,Yb^\ast).
+$$
+
+Thus, the word *maximally* refers to the process of searching over all permitted weight combinations.
+
+### Simple Example
+
+Imagine that the EEG dataset has two variables, $X_1$ and $X_2$, and the fMRI dataset has one variable, $Y_1$.
+
+Consider two possible EEG combinations:
+
+$$
+U_1 = X_1
+$$
+
+and
+
+$$
+U_2 = 0.8X_1 + 0.6X_2.
+$$
+
+Suppose:
+
+$$
+\operatorname{corr}(U_1,Y_1)=0.40
+$$
+
+but
+
+$$
+\operatorname{corr}(U_2,Y_1)=0.85.
+$$
+
+The second weighted combination is more strongly correlated with the fMRI variable. CCA systematically searches for the weights that produce the greatest possible correlation.
+
+### Why Scaling the Weights Does Not Increase Correlation
+
+CCA cannot create a larger correlation simply by multiplying the weights by a large number because correlation is unaffected by positive rescaling:
+
+$$
+\operatorname{corr}(cU,V)
+=
+\operatorname{corr}(U,V)
+$$
+
+for any positive constant $c$.
+
+CCA normally imposes the constraints:
+
+$$
+\operatorname{Var}(Xa)=1
+$$
+
+and
+
+$$
+\operatorname{Var}(Yb)=1.
+$$
+
+Under these constraints, it maximizes:
+
+$$
+a^\top \Sigma_{XY}b.
+$$
+
+### Key Point
+
+The canonical variables are:
+
+- linear combinations of variables in their respective datasets;
+- not automatically linear combinations of each other;
+- constructed using weights chosen to make their observed patterns as similar as possible.
+
+If CCA produces a correlation of $1$, then the optimized canonical variables are perfectly linearly related in the analyzed sample. If it produces a correlation of $0.7$, then $0.7$ is the strongest correlation CCA could find among the permitted linear combinations.
