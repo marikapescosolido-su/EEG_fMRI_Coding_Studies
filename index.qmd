@@ -155,3 +155,13 @@ plt.show()
 print("\nEEG traces plotted. Close the plot window to continue.")
 ```
 
+
+
+#-	CCA – fMRI and EEG have diff. temporal resolution. Time delay embedding? Where is the CCA peak correlation? What is the optimal time offset? Do a loop of CCA as a function. 
+-	How to estimate eigenvectors without diagonal.
+-	2024 Paper
+-	Take eeg 3 sec before fmri do cca analysis and look how the correlation decays with adding number of components. Uusally you need at least 2 secoidn, 1 one is arousoursl and the second one is the rest of arousal.
+-	In literature they often use 6 seconds for the offset. 6 sec from the eeg removed to balance things out.
+-	Multi-set CCA.
+-	What is the motivation to use CCA as a first step? Why are we not using joint-CCA (things with different units in the same space unless you are trying to understand wjat is shared between them). CCA linear. 
+-	Do not use the standard CCA implementation, but rather CCA.zoo. The standard one is using an algorithm that is trying to use the inverse as a whole (multiple folds slower) and it fsils if your dtaa Is very high dimension. Regulariszed cca – maybe better but still in the xoo library. 
