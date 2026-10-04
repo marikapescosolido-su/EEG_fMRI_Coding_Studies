@@ -223,8 +223,8 @@ $U$ is constructed only from EEG variables, and $V$ is constructed only from fMR
 
 To understand correlation, we first need to understand four ideas:
 
-1. the **mean**;
-2. a **deviation from the mean**;
+1. **mean**;
+2. **deviation from the mean**;
 3. **variance**;
 4. **covariance**.
 
@@ -239,6 +239,7 @@ Suppose we observe a variable $U$ at $n$ time points:
 $$
 U=(u_1,u_2,\ldots,u_n)^\top.
 $$
+where ^\top indicates transpose, meaning that the values are arranged as a column vector.
 
 Its sample mean is:
 
@@ -254,9 +255,6 @@ Here:
 - $u_i$ is the value of $U$ for observation $i$;
 - $i$ is the observation index;
 - $n$ is the total number of observations;
-- $\sum$ means “add together”;
-- $\bar{u}$, pronounced “$u$-bar,” is the mean of the observations;
-- the superscript $\top$ means transpose, indicating that the values are arranged as a column vector.
 
 For example, if:
 
@@ -276,9 +274,8 @@ $$
 
 The mean tells us where the center of the data is, but it does not tell us how much the observations vary around that center.
 
----
 
-## 2. Deviations From the Mean
+### Deviations From the Mean
 
 The deviation of observation $u_i$ from the mean is:
 
@@ -307,17 +304,8 @@ A deviation tells us:
 
 A negative deviation means the observation is below the mean. A positive deviation means it is above the mean.
 
-If we simply add the deviations, they always cancel:
 
-$$
-\sum_{i=1}^{n}(u_i-\bar{u})=0.
-$$
-
-Therefore, the ordinary sum of deviations cannot measure how spread out the data are.
-
----
-
-## 3. What Is Variance?
+### What Is Variance?
 
 Variance measures how much a variable changes, or **varies**, around its mean.
 
@@ -332,9 +320,9 @@ $$
 
 In words:
 
-> Variance is the average squared distance of the observations from their mean.
+> Variance is the average squared distance of the observations from their mean (i.e., the average squared deviation).
 
-### Why are the deviations squared?
+**Why are the deviations squared?**
 
 If we did not square the deviations, negative and positive deviations would cancel:
 
@@ -354,56 +342,34 @@ $$
 
 Squaring also gives larger deviations more influence than smaller deviations.
 
-### Why divide by $n-1$?
+**Why divide by $n-1$?: Bessel’s correction**
+The key idea is that the sample mean is usually closer to the sample observations than the true population mean is. Therefore, the distances measured from the sample mean (and consequently, the variance) tend to look slightly too small.
 
-When the data are a sample from a larger population, the sample mean $\bar{u}$ is estimated using the same observations. Once the mean is fixed, only $n-1$ deviations are free to vary because the deviations must sum to zero.
+There are two questions that can be answered:
+1. How spread out are these **exact numbers** in the sample?
+2. How spread out is the **larger population** from which the sample was drawn?
 
-Dividing by $n-1$ corrects the tendency of the sample to underestimate the population variance. This correction is called **Bessel’s correction**.
+Answers to the first question are called **sample variance**. Answers to the second question are called **population variance** (i.e., the default variance in statistics and coding libraries such as NumPy and SciPy).
 
-If the observations constitute the entire population rather than a sample, population variance is usually written as:
+- Sample Variance: Division by $n$. The sample is allowed to choose its own center.
+- Population Variance: Division by $n-1$. The population chooses the real center.
 
+> Note that $(n-1)$ does not make every individual sample variance correct. Some samples will still give values that are too high or too low. It makes the estimate correct on **average** across **all possible samples**.
+
+Instead of dividing by $n-1$, the factor $\mu_U$ can be introduced in the equation for population variance:
 $$
 \operatorname{Var}(U)
 =
 \frac{1}{n}
 \sum_{i=1}^{n}(u_i-\mu_U)^2,
 $$
-
 where $\mu_U$ is the population mean.
 
-### Example
 
-For:
+**The Meaning of Variance:**
 
-$$
-U=(1,2,3)^\top,
-\qquad
-\bar{u}=2,
-$$
-
-the sample variance is:
-
-$$
-\operatorname{var}(U)
-=
-\frac{(1-2)^2+(2-2)^2+(3-2)^2}{3-1}.
-$$
-
-Therefore:
-
-$$
-\operatorname{var}(U)
-=
-\frac{1+0+1}{2}
-=
-1.
-$$
-
-### What does the value mean?
-
-A small variance means the observations are concentrated near the mean.
-
-A large variance means the observations are widely spread around the mean.
+- A **small** variance means the observations are concentrated **near** the mean.
+- A **large** variance means the observations are **widely spread** around the mean.
 
 If every value is identical, then:
 
@@ -411,33 +377,12 @@ $$
 \operatorname{var}(U)=0.
 $$
 
-### Variance has squared units
+Note that variance has squared units. For example, if $U$ is measured in volts, then its variance is measured in V². This can make variance difficult to interpret, so we often take the square root of the variance to obtain the **standard deviation**, which has the same units as the original variable.
 
-If $U$ is measured in volts, then its variance is measured in:
 
-$$
-\text{volts}^2.
-$$
+### What Is Covariance?
 
-Because squared units can be difficult to interpret, we often take the square root of the variance.
-
-The result is the **standard deviation**:
-
-$$
-s_U
-=
-\sqrt{\operatorname{var}(U)}.
-$$
-
-The standard deviation has the same units as the original variable.
-
----
-
-## 4. What Is Covariance?
-
-Variance describes how **one variable** changes around its mean.
-
-Covariance describes how **two variables change together**.
+Variance describes how **one variable** changes around its mean, whereas covariance describes how **two variables change together**.
 
 Suppose:
 
@@ -478,119 +423,14 @@ The sign of this product tells us whether the variables are moving in the same o
 
 Therefore:
 
-- positive covariance means $U$ and $V$ tend to increase and decrease together;
-- negative covariance means one tends to increase when the other decreases;
-- covariance near zero means there is little **linear** co-movement.
+- **positive** covariance means $U$ and $V$ tend to increase and decrease together;
+- **negative** covariance means one tends to increase when the other decreases;
+- **covariance near zero** means there is little **linear** co-movement.
 
-### Example of positive covariance
+> Note that covariance depends on the units and scales of the variables. Converting one variable to a different unit changes the numerical value of the covariance, even though the underlying relationship has not changed. Therefore, covariance alone cannot tell us whether a relationship is “strong” without considering the scales of both variables. **Correlation** solves this problem by dividing the covariance by the standard deviations of the variables.
 
-Suppose:
 
-$$
-U=(1,2,3)^\top
-$$
-
-and:
-
-$$
-V=(2,4,6)^\top.
-$$
-
-Their means are:
-
-$$
-\bar{u}=2,
-\qquad
-\bar{v}=4.
-$$
-
-Their deviations are:
-
-$$
-U-\bar{u}=(-1,0,1)
-$$
-
-and:
-
-$$
-V-\bar{v}=(-2,0,2).
-$$
-
-Multiply the paired deviations:
-
-$$
-(-1)(-2)=2,
-$$
-
-$$
-(0)(0)=0,
-$$
-
-$$
-(1)(2)=2.
-$$
-
-All of the nonzero products are positive because the variables move in the same direction.
-
-The sample covariance is:
-
-$$
-\operatorname{cov}(U,V)
-=
-\frac{2+0+2}{3-1}
-=
-2.
-$$
-
-### Variance is a special case of covariance
-
-The covariance of a variable with itself is its variance:
-
-$$
-\operatorname{cov}(U,U)
-=
-\operatorname{var}(U).
-$$
-
-This is because:
-
-$$
-(u_i-\bar{u})(u_i-\bar{u})
-=
-(u_i-\bar{u})^2.
-$$
-
-Thus, variance and covariance are not unrelated concepts. Variance measures how one variable varies with itself, while covariance measures how two different variables vary together.
-
----
-
-## 5. Why Covariance Is Not Yet Correlation
-
-Covariance depends on the units and scales of the variables.
-
-For example, suppose we convert $V$ from volts to millivolts:
-
-$$
-V_{\mathrm{mV}}=1000V.
-$$
-
-The covariance becomes:
-
-$$
-\operatorname{cov}(U,1000V)
-=
-1000\operatorname{cov}(U,V).
-$$
-
-The underlying relationship has not changed, but the numerical covariance is now 1,000 times larger.
-
-Therefore, covariance alone cannot tell us whether a relationship is “strong” without considering the scales of both variables.
-
-Correlation solves this problem by dividing the covariance by the standard deviations of the variables.
-
----
-
-## 6. Pearson Correlation
+## Pearson Correlation
 
 For fixed variables $U$ and $V$, their Pearson correlation is:
 
@@ -628,29 +468,9 @@ s_U s_V
 }.
 $$
 
-In words:
+Hence, correlation is covariance divided by the amount of variation present in each variable. Using this **normalization** removes the units.
 
-> Correlation is covariance divided by the amount of variation present in each variable.
-
-This normalization removes the units.
-
-If $U$ is measured in volts and $V$ is measured in percent signal change, covariance has units:
-
-$$
-\text{volts}\times\text{percent signal change}.
-$$
-
-The denominator has the same units:
-
-$$
-s_U s_V
-=
-\text{volts}\times\text{percent signal change}.
-$$
-
-The units therefore cancel, making correlation unitless.
-
-### Meaning of the correlation value
+**Interpretation of correlation:**
 
 Pearson correlation satisfies:
 
@@ -668,143 +488,7 @@ Its interpretation is:
 A correlation of zero does not necessarily mean that the variables are unrelated. They could have a nonlinear relationship that Pearson correlation does not detect.
 :::
 
----
-
-## 7. Correlation in Terms of the Observed Values
-
-The sample correlation is:
-
-$$
-r(U,V)
-=
-\frac{
-\sum_{i=1}^{n}(u_i-\bar{u})(v_i-\bar{v})
-}{
-\sqrt{
-\sum_{i=1}^{n}(u_i-\bar{u})^2
-}
-\sqrt{
-\sum_{i=1}^{n}(v_i-\bar{v})^2
-}
-}.
-$$
-
-Every element in this formula has a specific meaning:
-
-- $r(U,V)$ is the sample Pearson correlation between $U$ and $V$;
-- $U$ and $V$ are the two variables being compared;
-- $u_i$ is observation $i$ of $U$;
-- $v_i$ is observation $i$ of $V$;
-- $\bar{u}$ is the sample mean of $U$;
-- $\bar{v}$ is the sample mean of $V$;
-- $u_i-\bar{u}$ is the deviation of $u_i$ from its mean;
-- $v_i-\bar{v}$ is the deviation of $v_i$ from its mean;
-- $\sum_{i=1}^{n}$ means to perform the calculation for every observation and add the results;
-- $n$ is the total number of paired observations;
-- the numerator measures how $U$ and $V$ vary together;
-- the first term in the denominator measures the total variation in $U$;
-- the second term in the denominator measures the total variation in $V$;
-- $\sqrt{\phantom{x}}$ denotes the square root.
-
-The factors of $1/(n-1)$ do not appear explicitly in this formula because the factor in the covariance cancels with the factors in the two variances.
-
----
-
-## 8. How Were Variance, Covariance, and Correlation Developed?
-
-These ideas were not invented all at once by one person. They developed gradually from attempts to describe measurement error, biological variation, and relationships between variables.
-
-### The original problem: how do we measure spread?
-
-Researchers needed a way to describe how observations were distributed around a typical value.
-
-Simply adding deviations from the mean did not work because:
-
-$$
-\sum_{i=1}^{n}(u_i-\bar{u})=0.
-$$
-
-Squaring the deviations solved this cancellation problem:
-
-$$
-\sum_{i=1}^{n}(u_i-\bar{u})^2.
-$$
-
-Squared deviations were also mathematically convenient in the development of least-squares methods and probability theory.
-
-The idea of measuring variation using squared deviations existed before the modern word *variance*. Ronald A. Fisher introduced the term *variance* into modern statistical work in his 1918 paper on heredity, where he decomposed biological variation into contributions from different sources. See [Fisher’s 1918 paper](https://digital.library.adelaide.edu.au/items/5ed47714-2635-4af9-8409-cf7eb6f87c3b/full).
-
-### The next problem: how do two variables vary together?
-
-If squared deviations describe the variation of one variable, then products of paired deviations provide a natural way to describe the joint variation of two variables:
-
-$$
-(u_i-\bar{u})(v_i-\bar{v}).
-$$
-
-This leads to covariance.
-
-The logic is:
-
-- use one deviation twice to measure individual variation:
-
-  $$
-  (u_i-\bar{u})^2;
-  $$
-
-- use deviations from two variables to measure shared variation:
-
-  $$
-  (u_i-\bar{u})(v_i-\bar{v}).
-  $$
-
-Therefore, covariance is a natural extension of variance.
-
-### The scaling problem
-
-Covariance changes when measurement units change. Researchers therefore needed a standardized measure of co-variation.
-
-Dividing covariance by both standard deviations produces a unitless number:
-
-$$
-\frac{
-\operatorname{cov}(U,V)
-}{
-s_U s_V
-}.
-$$
-
-This became the Pearson product-moment correlation coefficient.
-
-Francis Galton developed early ideas of regression and correlation while studying relationships between biological measurements and heredity. In 1888, he described correlated variables as variables for which variation in one is accompanied, on average, by variation in another. See [Galton’s 1888 paper](https://makingscience.royalsociety.org/items/pp_13_6/).
-
-Karl Pearson subsequently gave correlation much of its modern mathematical form during the 1890s.
-
-The broad historical development was therefore:
-
-$$
-\text{deviations}
-\longrightarrow
-\text{squared deviations}
-\longrightarrow
-\text{variance}
-$$
-
-and:
-
-$$
-\text{paired deviations}
-\longrightarrow
-\text{covariance}
-\longrightarrow
-\text{standardized covariance}
-\longrightarrow
-\text{correlation}.
-$$
-
----
-
-## 9. How Does This Apply to CCA?
+### How Does This Apply to CCA?
 
 In CCA, $X$ and $Y$ are data matrices:
 
@@ -897,9 +581,6 @@ This formula asks:
 
 > How strongly do the weighted EEG pattern $Xa$ and the weighted fMRI pattern $Yb$ vary together, relative to how much each pattern varies on its own?
 
----
-
-## 10. What Does “Maximum Correlation” Mean?
 
 Different choices of $a$ and $b$ produce different canonical variables:
 
@@ -951,7 +632,6 @@ Here:
 - $\operatorname{arg\,max}$ returns the inputs that maximize a function;
 - $a^\ast$ is the optimal EEG weight vector;
 - $b^\ast$ is the optimal fMRI weight vector;
-- the symbol $^\ast$ means “optimal.”
 
 The distinction is:
 
