@@ -218,183 +218,461 @@ might be a linear combination of fMRI regions.
 
 $U$ is constructed only from EEG variables, and $V$ is constructed only from fMRI variables. Therefore, $U$ and $V$ are not automatically highly correlated.
 
-## What Does CCA Optimize?
 
-Different choices of the weights $a$ and $b$ produce different canonical variables and different correlations.
+## How Is Correlation Defined?
 
-CCA searches for the weights that solve:
+To understand correlation, we first need to understand four ideas:
+
+1. the **mean**;
+2. a **deviation from the mean**;
+3. **variance**;
+4. **covariance**.
+
+Correlation is constructed from variance and covariance.
+
+---
+
+### The Mean
+
+Suppose we observe a variable $U$ at $n$ time points:
 
 $$
-(a^\ast,b^\ast)
+U=(u_1,u_2,\ldots,u_n)^\top.
+$$
+
+Its sample mean is:
+
+$$
+\bar{u}
 =
-\underset{a,b}{\operatorname{arg\,max}}
-\;
-\operatorname{corr}(Xa,Yb).
+\frac{1}{n}
+\sum_{i=1}^{n}u_i.
 $$
 
-The resulting maximum correlation is:
+Here:
+
+- $u_i$ is the value of $U$ for observation $i$;
+- $i$ is the observation index;
+- $n$ is the total number of observations;
+- $\sum$ means “add together”;
+- $\bar{u}$, pronounced “$u$-bar,” is the mean of the observations;
+- the superscript $\top$ means transpose, indicating that the values are arranged as a column vector.
+
+For example, if:
 
 $$
-\rho_1
+U=(1,2,3)^\top,
+$$
+
+then:
+
+$$
+\bar{u}
 =
-\operatorname{corr}(Xa^\ast,Yb^\ast).
-$$
-
-Thus, the word *maximally* refers to the process of searching over all permitted weight combinations.
-
-## How is the correlation defined?
-
-For fixed weights $a$ and $b$, their Pearson correlation is:
-
-$$
-\operatorname{corr}(U,V)
+\frac{1+2+3}{3}
 =
-\frac{\operatorname{cov}(U,V)}
-{\sqrt{\operatorname{var}(U)\operatorname{var}(V)}}.
+2.
 $$
 
-Substituting $U= Xa$ and $V=Yb$ gives:
+The mean tells us where the center of the data is, but it does not tell us how much the observations vary around that center.
+
+---
+
+## 2. Deviations From the Mean
+
+The deviation of observation $u_i$ from the mean is:
 
 $$
-\operatorname{corr}(Xa,Yb)
+u_i-\bar{u}.
+$$
+
+For:
+
+$$
+U=(1,2,3)^\top
+$$
+
+with $\bar{u}=2$, the deviations are:
+
+$$
+(1-2,\;2-2,\;3-2)
 =
-\frac{\operatorname{cov}(Xa,Yb)}
-{\sqrt{\operatorname{var}(Xa)\operatorname{var}(Yb)}}.
+(-1,0,1).
 $$
 
-The **maximum canonical correlation** is defined as:
+A deviation tells us:
+
+- whether an observation is below or above the mean;
+- how far it is from the mean.
+
+A negative deviation means the observation is below the mean. A positive deviation means it is above the mean.
+
+If we simply add the deviations, they always cancel:
 
 $$
-\rho_1
+\sum_{i=1}^{n}(u_i-\bar{u})=0.
+$$
+
+Therefore, the ordinary sum of deviations cannot measure how spread out the data are.
+
+---
+
+## 3. What Is Variance?
+
+Variance measures how much a variable changes, or **varies**, around its mean.
+
+The sample variance of $U$ is:
+
+$$
+\operatorname{var}(U)
 =
-\max_{a,b}
-\operatorname{corr}(Xa,Yb).
+\frac{1}{n-1}
+\sum_{i=1}^{n}(u_i-\bar{u})^2.
 $$
 
-This means:
+In words:
 
-1. Choose a possible EEG weight vector $a$.
-2. Choose a possible fMRI weight vector $b$.
-3. Calculate $U= Xa$ and $V=Yb$.
-4. Calculate the Pearson correlation between $U$ and $V$.
-5. Repeat for all permitted choices of $a$ and $b$.
-6. Keep the largest correlation.
+> Variance is the average squared distance of the observations from their mean.
 
-The optimal weights are:
+### Why are the deviations squared?
+
+If we did not square the deviations, negative and positive deviations would cancel:
 
 $$
-(a^\ast,b^\ast)
+-1+0+1=0.
+$$
+
+Squaring prevents this cancellation:
+
+$$
+(-1)^2+0^2+1^2
 =
-\underset{a,b}{\operatorname{arg\,max}}
-\operatorname{corr}(Xa,Yb).
-$$
-
-The maximum correlation is then:
-
-$$
-\rho_1
+1+0+1
 =
-\operatorname{corr}(Xa^\ast,Yb^\ast).
+2.
 $$
 
-Here, $\operatorname{arg\,max}$ returns the weights that produce the maximum, whereas $\max$ returns the correlation value itself.
+Squaring also gives larger deviations more influence than smaller deviations.
 
-### Definition Using Covariance Matrices
+### Why divide by $n-1$?
 
-Let:
+When the data are a sample from a larger population, the sample mean $\bar{u}$ is estimated using the same observations. Once the mean is fixed, only $n-1$ deviations are free to vary because the deviations must sum to zero.
 
-- $\Sigma_{XX}$ be the covariance matrix of $X$;
-- $\Sigma_{YY}$ be the covariance matrix of $Y$;
-- $\Sigma_{XY}$ be the cross-covariance matrix between $X$ and $Y$.
+Dividing by $n-1$ corrects the tendency of the sample to underestimate the population variance. This correction is called **Bessel’s correction**.
 
-Then:
+If the observations constitute the entire population rather than a sample, population variance is usually written as:
 
 $$
-\operatorname{cov}(Xa,Yb)
+\operatorname{Var}(U)
 =
-a^\top\Sigma_{XY}b,
+\frac{1}{n}
+\sum_{i=1}^{n}(u_i-\mu_U)^2,
 $$
 
+where $\mu_U$ is the population mean.
+
+### Example
+
+For:
+
 $$
-\operatorname{var}(Xa)
+U=(1,2,3)^\top,
+\qquad
+\bar{u}=2,
+$$
+
+the sample variance is:
+
+$$
+\operatorname{var}(U)
 =
-a^\top\Sigma_{XX}a,
+\frac{(1-2)^2+(2-2)^2+(3-2)^2}{3-1}.
 $$
 
-and
+Therefore:
 
 $$
-\operatorname{var}(Yb)
+\operatorname{var}(U)
 =
-b^\top\Sigma_{YY}b.
-$$
-
-Therefore, the maximum canonical correlation is:
-
-$$
-\rho_1
+\frac{1+0+1}{2}
 =
-\max_{a,b}
-\frac{
-a^\top\Sigma_{XY}b
-}{
-\sqrt{
-\left(a^\top\Sigma_{XX}a\right)
-\left(b^\top\Sigma_{YY}b\right)
-}
-}.
+1.
 $$
 
-This is the formal definition of the first canonical correlation.
+### What does the value mean?
 
-### Equivalent Constrained Definition
+A small variance means the observations are concentrated near the mean.
 
-CCA can equivalently require the canonical variables to have unit variance:
+A large variance means the observations are widely spread around the mean.
 
-$$
-a^\top\Sigma_{XX}a=1
-$$
-
-and
+If every value is identical, then:
 
 $$
-b^\top\Sigma_{YY}b=1.
+\operatorname{var}(U)=0.
 $$
 
-It then solves:
+### Variance has squared units
+
+If $U$ is measured in volts, then its variance is measured in:
 
 $$
-\rho_1
+\text{volts}^2.
+$$
+
+Because squared units can be difficult to interpret, we often take the square root of the variance.
+
+The result is the **standard deviation**:
+
+$$
+s_U
 =
-\max_{a,b}
-a^\top\Sigma_{XY}b
+\sqrt{\operatorname{var}(U)}.
 $$
 
-subject to those two constraints.
+The standard deviation has the same units as the original variable.
 
-Because both canonical variables have variance equal to $1$, their covariance is equal to their correlation:
+---
 
-$$
-\operatorname{corr}(Xa,Yb)
-=
-\operatorname{cov}(Xa,Yb).
-$$
+## 4. What Is Covariance?
 
-### In Terms of the Observed Values
+Variance describes how **one variable** changes around its mean.
 
-Suppose the canonical-variable vectors contain $n$ observations:
+Covariance describes how **two variables change together**.
+
+Suppose:
 
 $$
 U=(u_1,\ldots,u_n)^\top
 $$
 
-and
+and:
 
 $$
 V=(v_1,\ldots,v_n)^\top.
 $$
 
-Their sample correlation is:
+Their sample covariance is:
+
+$$
+\operatorname{cov}(U,V)
+=
+\frac{1}{n-1}
+\sum_{i=1}^{n}
+(u_i-\bar{u})(v_i-\bar{v}).
+$$
+
+For each observation, covariance multiplies the two deviations:
+
+$$
+(u_i-\bar{u})(v_i-\bar{v}).
+$$
+
+The sign of this product tells us whether the variables are moving in the same or opposite directions.
+
+| Position of $u_i$ | Position of $v_i$ | Product | Meaning |
+|---|---|---:|---|
+| Above its mean | Above its mean | Positive | They move together |
+| Below its mean | Below its mean | Positive | They move together |
+| Above its mean | Below its mean | Negative | They move oppositely |
+| Below its mean | Above its mean | Negative | They move oppositely |
+
+Therefore:
+
+- positive covariance means $U$ and $V$ tend to increase and decrease together;
+- negative covariance means one tends to increase when the other decreases;
+- covariance near zero means there is little **linear** co-movement.
+
+### Example of positive covariance
+
+Suppose:
+
+$$
+U=(1,2,3)^\top
+$$
+
+and:
+
+$$
+V=(2,4,6)^\top.
+$$
+
+Their means are:
+
+$$
+\bar{u}=2,
+\qquad
+\bar{v}=4.
+$$
+
+Their deviations are:
+
+$$
+U-\bar{u}=(-1,0,1)
+$$
+
+and:
+
+$$
+V-\bar{v}=(-2,0,2).
+$$
+
+Multiply the paired deviations:
+
+$$
+(-1)(-2)=2,
+$$
+
+$$
+(0)(0)=0,
+$$
+
+$$
+(1)(2)=2.
+$$
+
+All of the nonzero products are positive because the variables move in the same direction.
+
+The sample covariance is:
+
+$$
+\operatorname{cov}(U,V)
+=
+\frac{2+0+2}{3-1}
+=
+2.
+$$
+
+### Variance is a special case of covariance
+
+The covariance of a variable with itself is its variance:
+
+$$
+\operatorname{cov}(U,U)
+=
+\operatorname{var}(U).
+$$
+
+This is because:
+
+$$
+(u_i-\bar{u})(u_i-\bar{u})
+=
+(u_i-\bar{u})^2.
+$$
+
+Thus, variance and covariance are not unrelated concepts. Variance measures how one variable varies with itself, while covariance measures how two different variables vary together.
+
+---
+
+## 5. Why Covariance Is Not Yet Correlation
+
+Covariance depends on the units and scales of the variables.
+
+For example, suppose we convert $V$ from volts to millivolts:
+
+$$
+V_{\mathrm{mV}}=1000V.
+$$
+
+The covariance becomes:
+
+$$
+\operatorname{cov}(U,1000V)
+=
+1000\operatorname{cov}(U,V).
+$$
+
+The underlying relationship has not changed, but the numerical covariance is now 1,000 times larger.
+
+Therefore, covariance alone cannot tell us whether a relationship is “strong” without considering the scales of both variables.
+
+Correlation solves this problem by dividing the covariance by the standard deviations of the variables.
+
+---
+
+## 6. Pearson Correlation
+
+For fixed variables $U$ and $V$, their Pearson correlation is:
+
+$$
+\operatorname{corr}(U,V)
+=
+\frac{
+\operatorname{cov}(U,V)
+}{
+\sqrt{
+\operatorname{var}(U)\operatorname{var}(V)
+}
+}.
+$$
+
+Because:
+
+$$
+\sqrt{
+\operatorname{var}(U)\operatorname{var}(V)
+}
+=
+s_U s_V,
+$$
+
+we can also write:
+
+$$
+\operatorname{corr}(U,V)
+=
+\frac{
+\operatorname{cov}(U,V)
+}{
+s_U s_V
+}.
+$$
+
+In words:
+
+> Correlation is covariance divided by the amount of variation present in each variable.
+
+This normalization removes the units.
+
+If $U$ is measured in volts and $V$ is measured in percent signal change, covariance has units:
+
+$$
+\text{volts}\times\text{percent signal change}.
+$$
+
+The denominator has the same units:
+
+$$
+s_U s_V
+=
+\text{volts}\times\text{percent signal change}.
+$$
+
+The units therefore cancel, making correlation unitless.
+
+### Meaning of the correlation value
+
+Pearson correlation satisfies:
+
+$$
+-1\leq \operatorname{corr}(U,V)\leq 1.
+$$
+
+Its interpretation is:
+
+- $\operatorname{corr}(U,V)=1$: a perfect positive linear relationship;
+- $\operatorname{corr}(U,V)=0$: no linear relationship;
+- $\operatorname{corr}(U,V)=-1$: a perfect negative linear relationship.
+
+::: {.callout-note}
+A correlation of zero does not necessarily mean that the variables are unrelated. They could have a nonlinear relationship that Pearson correlation does not detect.
+:::
+
+---
+
+## 7. Correlation in Terms of the Observed Values
+
+The sample correlation is:
 
 $$
 r(U,V)
@@ -411,57 +689,647 @@ r(U,V)
 }.
 $$
 
-CCA selects $a$ and $b$ so that this quantity is as large as possible.
+Every element in this formula has a specific meaning:
 
-The result satisfies:
+- $r(U,V)$ is the sample Pearson correlation between $U$ and $V$;
+- $U$ and $V$ are the two variables being compared;
+- $u_i$ is observation $i$ of $U$;
+- $v_i$ is observation $i$ of $V$;
+- $\bar{u}$ is the sample mean of $U$;
+- $\bar{v}$ is the sample mean of $V$;
+- $u_i-\bar{u}$ is the deviation of $u_i$ from its mean;
+- $v_i-\bar{v}$ is the deviation of $v_i$ from its mean;
+- $\sum_{i=1}^{n}$ means to perform the calculation for every observation and add the results;
+- $n$ is the total number of paired observations;
+- the numerator measures how $U$ and $V$ vary together;
+- the first term in the denominator measures the total variation in $U$;
+- the second term in the denominator measures the total variation in $V$;
+- $\sqrt{\phantom{x}}$ denotes the square root.
+
+The factors of $1/(n-1)$ do not appear explicitly in this formula because the factor in the covariance cancels with the factors in the two variances.
+
+---
+
+## 8. How Were Variance, Covariance, and Correlation Developed?
+
+These ideas were not invented all at once by one person. They developed gradually from attempts to describe measurement error, biological variation, and relationships between variables.
+
+### The original problem: how do we measure spread?
+
+Researchers needed a way to describe how observations were distributed around a typical value.
+
+Simply adding deviations from the mean did not work because:
 
 $$
-0 \leq \rho_1 \leq 1.
+\sum_{i=1}^{n}(u_i-\bar{u})=0.
 $$
 
-A large value means that CCA found one weighted pattern in $X$ and one weighted pattern in $Y$ that change similarly across observations.
+Squaring the deviations solved this cancellation problem:
 
-::: {.callout-important}
-A large maximum correlation in the training data does not necessarily imply a strong relationship in new data. When the number of features is large relative to the number of observations, CCA can overfit and may even produce a training correlation close to $1$. The canonical correlation should therefore be evaluated on held-out data or with cross-validation.
-:::
+$$
+\sum_{i=1}^{n}(u_i-\bar{u})^2.
+$$
 
+Squared deviations were also mathematically convenient in the development of least-squares methods and probability theory.
 
-### Why Scaling the Weights Does Not Increase Correlation
+The idea of measuring variation using squared deviations existed before the modern word *variance*. Ronald A. Fisher introduced the term *variance* into modern statistical work in his 1918 paper on heredity, where he decomposed biological variation into contributions from different sources. See [Fisher’s 1918 paper](https://digital.library.adelaide.edu.au/items/5ed47714-2635-4af9-8409-cf7eb6f87c3b/full).
 
-CCA cannot create a larger correlation simply by multiplying the weights by a large number because correlation is unaffected by positive rescaling:
+### The next problem: how do two variables vary together?
+
+If squared deviations describe the variation of one variable, then products of paired deviations provide a natural way to describe the joint variation of two variables:
+
+$$
+(u_i-\bar{u})(v_i-\bar{v}).
+$$
+
+This leads to covariance.
+
+The logic is:
+
+- use one deviation twice to measure individual variation:
+
+  $$
+  (u_i-\bar{u})^2;
+  $$
+
+- use deviations from two variables to measure shared variation:
+
+  $$
+  (u_i-\bar{u})(v_i-\bar{v}).
+  $$
+
+Therefore, covariance is a natural extension of variance.
+
+### The scaling problem
+
+Covariance changes when measurement units change. Researchers therefore needed a standardized measure of co-variation.
+
+Dividing covariance by both standard deviations produces a unitless number:
+
+$$
+\frac{
+\operatorname{cov}(U,V)
+}{
+s_U s_V
+}.
+$$
+
+This became the Pearson product-moment correlation coefficient.
+
+Francis Galton developed early ideas of regression and correlation while studying relationships between biological measurements and heredity. In 1888, he described correlated variables as variables for which variation in one is accompanied, on average, by variation in another. See [Galton’s 1888 paper](https://makingscience.royalsociety.org/items/pp_13_6/).
+
+Karl Pearson subsequently gave correlation much of its modern mathematical form during the 1890s.
+
+The broad historical development was therefore:
+
+$$
+\text{deviations}
+\longrightarrow
+\text{squared deviations}
+\longrightarrow
+\text{variance}
+$$
+
+and:
+
+$$
+\text{paired deviations}
+\longrightarrow
+\text{covariance}
+\longrightarrow
+\text{standardized covariance}
+\longrightarrow
+\text{correlation}.
+$$
+
+---
+
+## 9. How Does This Apply to CCA?
+
+In CCA, $X$ and $Y$ are data matrices:
+
+$$
+X\in\mathbb{R}^{n\times p},
+\qquad
+Y\in\mathbb{R}^{n\times q}.
+$$
+
+Here:
+
+- $n$ is the number of matched observations or time points;
+- $p$ is the number of variables in $X$, such as EEG features;
+- $q$ is the number of variables in $Y$, such as fMRI features.
+
+The vectors:
+
+$$
+a\in\mathbb{R}^{p}
+$$
+
+and:
+
+$$
+b\in\mathbb{R}^{q}
+$$
+
+contain weights.
+
+CCA uses these weights to create:
+
+$$
+U=Xa
+$$
+
+and:
+
+$$
+V=Yb.
+$$
+
+Here:
+
+- $U$ is a weighted combination of the columns of $X$;
+- $V$ is a weighted combination of the columns of $Y$;
+- both $U$ and $V$ contain $n$ values;
+- $U$ and $V$ are called **canonical variables** or **canonical variates**.
+
+For fixed weights $a$ and $b$, their Pearson correlation is:
+
+$$
+\operatorname{corr}(U,V)
+=
+\frac{
+\operatorname{cov}(U,V)
+}{
+\sqrt{
+\operatorname{var}(U)\operatorname{var}(V)
+}
+}.
+$$
+
+Substituting:
+
+$$
+U=Xa
+$$
+
+and:
+
+$$
+V=Yb
+$$
+
+gives:
+
+$$
+\operatorname{corr}(Xa,Yb)
+=
+\frac{
+\operatorname{cov}(Xa,Yb)
+}{
+\sqrt{
+\operatorname{var}(Xa)\operatorname{var}(Yb)
+}
+}.
+$$
+
+This formula asks:
+
+> How strongly do the weighted EEG pattern $Xa$ and the weighted fMRI pattern $Yb$ vary together, relative to how much each pattern varies on its own?
+
+---
+
+## 10. What Does “Maximum Correlation” Mean?
+
+Different choices of $a$ and $b$ produce different canonical variables:
+
+$$
+U=Xa,
+\qquad
+V=Yb.
+$$
+
+They therefore produce different correlations.
+
+CCA searches for the weights that produce the largest possible correlation:
+
+$$
+\rho_1
+=
+\max_{a,b}
+\operatorname{corr}(Xa,Yb).
+$$
+
+The symbols mean:
+
+- $\rho$ is the Greek letter rho and represents a canonical correlation;
+- the subscript $1$ indicates the first canonical correlation;
+- $\max$ means “take the largest possible value”;
+- $a,b$ under $\max$ indicate that CCA searches over possible values of both weight vectors;
+- $\operatorname{corr}(Xa,Yb)$ is the Pearson correlation between the two weighted combinations.
+
+This means:
+
+1. Choose a possible EEG weight vector $a$.
+2. Choose a possible fMRI weight vector $b$.
+3. Calculate $U=Xa$.
+4. Calculate $V=Yb$.
+5. Calculate $\operatorname{corr}(U,V)$.
+6. Search for the weights that produce the largest correlation.
+
+The optimal weights are written as:
+
+$$
+(a^\ast,b^\ast)
+=
+\underset{a,b}{\operatorname{arg\,max}}
+\operatorname{corr}(Xa,Yb).
+$$
+
+Here:
+
+- $\operatorname{arg\,max}$ returns the inputs that maximize a function;
+- $a^\ast$ is the optimal EEG weight vector;
+- $b^\ast$ is the optimal fMRI weight vector;
+- the symbol $^\ast$ means “optimal.”
+
+The distinction is:
+
+$$
+\operatorname{arg\,max}
+\quad\longrightarrow\quad
+\text{the optimal weights}
+$$
+
+whereas:
+
+$$
+\max
+\quad\longrightarrow\quad
+\text{the resulting correlation value}.
+$$
+
+Therefore:
+
+$$
+\rho_1
+=
+\operatorname{corr}(Xa^\ast,Yb^\ast).
+$$
+
+---
+
+## 11. Covariance Matrices
+
+When datasets contain several variables, variance and covariance can be organized into matrices.
+
+### Covariance matrix of $X$
+
+Let:
+
+$$
+X=
+\begin{bmatrix}
+X_1 & X_2 & \cdots & X_p
+\end{bmatrix}.
+$$
+
+The covariance matrix of $X$ is:
+
+$$
+\Sigma_{XX}
+=
+\begin{bmatrix}
+\operatorname{var}(X_1)
+&
+\operatorname{cov}(X_1,X_2)
+&
+\cdots
+\\
+\operatorname{cov}(X_2,X_1)
+&
+\operatorname{var}(X_2)
+&
+\cdots
+\\
+\vdots
+&
+\vdots
+&
+\ddots
+\end{bmatrix}.
+$$
+
+The symbol $\Sigma$, pronounced “sigma,” is commonly used for a covariance matrix.
+
+In $\Sigma_{XX}$:
+
+- the diagonal elements are the variances of the variables in $X$;
+- the off-diagonal elements are the covariances between pairs of variables in $X$.
+
+Similarly:
+
+$$
+\Sigma_{YY}
+$$
+
+contains the variances and covariances of the variables in $Y$.
+
+### Cross-covariance matrix
+
+The cross-covariance matrix is:
+
+$$
+\Sigma_{XY}.
+$$
+
+Its element in row $j$ and column $k$ is:
+
+$$
+(\Sigma_{XY})_{jk}
+=
+\operatorname{cov}(X_j,Y_k).
+$$
+
+It describes how every variable in $X$ varies with every variable in $Y$.
+
+If $X$ has $p$ features and $Y$ has $q$ features, then:
+
+$$
+\Sigma_{XY}\in\mathbb{R}^{p\times q}.
+$$
+
+---
+
+## 12. Why the Matrix Formulas Work
+
+The covariance between the canonical variables is:
+
+$$
+\operatorname{cov}(Xa,Yb)
+=
+a^\top\Sigma_{XY}b.
+$$
+
+The elements mean:
+
+- $a$ contains the weights applied to the variables in $X$;
+- $b$ contains the weights applied to the variables in $Y$;
+- $a^\top$ is the transpose of $a$, turning it from a column vector into a row vector;
+- $\Sigma_{XY}$ contains all cross-covariances between $X$ and $Y$;
+- multiplication by $a^\top$ and $b$ combines those cross-covariances according to the selected weights.
+
+Likewise:
+
+$$
+\operatorname{var}(Xa)
+=
+a^\top\Sigma_{XX}a
+$$
+
+and:
+
+$$
+\operatorname{var}(Yb)
+=
+b^\top\Sigma_{YY}b.
+$$
+
+These expressions calculate how much the weighted combinations $Xa$ and $Yb$ vary.
+
+Substituting these quantities into the correlation formula gives:
+
+$$
+\rho_1
+=
+\max_{a,b}
+\frac{
+a^\top\Sigma_{XY}b
+}{
+\sqrt{
+\left(a^\top\Sigma_{XX}a\right)
+\left(b^\top\Sigma_{YY}b\right)
+}
+}.
+$$
+
+The numerator:
+
+$$
+a^\top\Sigma_{XY}b
+$$
+
+measures how much the two weighted patterns vary together.
+
+The first denominator term:
+
+$$
+a^\top\Sigma_{XX}a
+$$
+
+is the variance of the weighted $X$ pattern.
+
+The second denominator term:
+
+$$
+b^\top\Sigma_{YY}b
+$$
+
+is the variance of the weighted $Y$ pattern.
+
+The square root converts the product of the two variances into the product of their standard deviations.
+
+Thus, the complete expression is:
+
+$$
+\text{correlation}
+=
+\frac{
+\text{shared variation}
+}{
+\text{variation in the first pattern}
+\times
+\text{variation in the second pattern}
+}.
+$$
+
+More precisely:
+
+$$
+\text{correlation}
+=
+\frac{
+\text{covariance}
+}{
+\text{standard deviation of }U
+\times
+\text{standard deviation of }V
+}.
+$$
+
+---
+
+## 13. Equivalent Constrained Definition
+
+CCA can require both canonical variables to have variance equal to one:
+
+$$
+a^\top\Sigma_{XX}a=1
+$$
+
+and:
+
+$$
+b^\top\Sigma_{YY}b=1.
+$$
+
+These constraints are equivalent to:
+
+$$
+\operatorname{var}(Xa)=1
+$$
+
+and:
+
+$$
+\operatorname{var}(Yb)=1.
+$$
+
+CCA then solves:
+
+$$
+\rho_1
+=
+\max_{a,b}
+a^\top\Sigma_{XY}b
+$$
+
+subject to the two unit-variance constraints.
+
+Because:
+
+$$
+\operatorname{var}(Xa)=1
+$$
+
+and:
+
+$$
+\operatorname{var}(Yb)=1,
+$$
+
+the denominator of the correlation is:
+
+$$
+\sqrt{1\times1}=1.
+$$
+
+Therefore:
+
+$$
+\operatorname{corr}(Xa,Yb)
+=
+\frac{\operatorname{cov}(Xa,Yb)}{1}
+=
+\operatorname{cov}(Xa,Yb).
+$$
+
+CCA is not saying that covariance and correlation are always equal. They are equal here only because the canonical variables have been constrained to have unit variance.
+
+---
+
+## 14. Why Scaling the Weights Does Not Increase Correlation
+
+Suppose we multiply $U$ by a positive constant $c$:
+
+$$
+U_{\mathrm{new}}=cU.
+$$
+
+Its covariance with $V$ becomes:
+
+$$
+\operatorname{cov}(cU,V)
+=
+c\operatorname{cov}(U,V).
+$$
+
+Its standard deviation also becomes:
+
+$$
+s_{cU}=c s_U.
+$$
+
+Therefore:
 
 $$
 \operatorname{corr}(cU,V)
 =
-\operatorname{corr}(U,V)
+\frac{
+c\operatorname{cov}(U,V)
+}{
+(c s_U)s_V
+}.
 $$
 
-for any positive constant $c$.
-
-CCA normally imposes the constraints:
+The $c$ terms cancel:
 
 $$
-\operatorname{Var}(Xa)=1
+\operatorname{corr}(cU,V)
+=
+\operatorname{corr}(U,V).
 $$
 
-and
+CCA therefore cannot produce a larger correlation merely by making the weights larger.
+
+If $c<0$, the magnitude remains the same but the sign reverses:
 
 $$
-\operatorname{Var}(Yb)=1.
+\operatorname{corr}(cU,V)
+=
+-\operatorname{corr}(U,V).
 $$
 
-Under these constraints, it maximizes:
+Because the signs of both canonical weight vectors can be reversed without changing the underlying solution, canonical correlations are conventionally reported as nonnegative:
 
 $$
-a^\top \Sigma_{XY}b.
+0\leq\rho_1\leq1.
 $$
 
-### Key Point
+---
 
-The canonical variables are:
+## 15. Key Interpretation
 
-- linear combinations of variables in their respective datasets;
-- not automatically linear combinations of each other;
-- constructed using weights chosen to make their observed patterns as similar as possible.
+Variance asks:
 
-If CCA produces a correlation of $1$, then the optimized canonical variables are perfectly linearly related in the analyzed sample. If it produces a correlation of $0.7$, then $0.7$ is the strongest correlation CCA could find among the permitted linear combinations.
+> How much does one variable move around its own mean?
+
+Covariance asks:
+
+> Do two variables tend to move away from their means together?
+
+Correlation asks:
+
+> How strongly do they move together after accounting for how much each one varies?
+
+CCA asks:
+
+> Which weighted combination of the variables in $X$ and which weighted combination of the variables in $Y$ have the largest possible correlation?
+
+The logical sequence is:
+
+$$
+X,Y
+\longrightarrow
+Xa,Yb
+\longrightarrow
+\operatorname{cov}(Xa,Yb)
+\longrightarrow
+\operatorname{corr}(Xa,Yb)
+\longrightarrow
+\max_{a,b}\operatorname{corr}(Xa,Yb).
+$$
+
+::: {.callout-important}
+A high maximum correlation in the training data does not necessarily indicate a relationship that will generalize to new observations. When there are many EEG or fMRI features relative to the number of observations, CCA can overfit and may produce a correlation close to $1$ by chance. The correlation should therefore be evaluated using held-out data or cross-validation.
+:::
