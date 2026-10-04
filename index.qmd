@@ -488,7 +488,7 @@ Its interpretation is:
 A correlation of zero does not necessarily mean that the variables are unrelated. They could have a nonlinear relationship that Pearson correlation does not detect.
 :::
 
-### How Does This Apply to CCA?
+## How Does This Apply to CCA?
 
 In CCA, $X$ and $Y$ are data matrices:
 
@@ -601,14 +601,6 @@ $$
 \operatorname{corr}(Xa,Yb).
 $$
 
-The symbols mean:
-
-- $\rho$ is the Greek letter rho and represents a canonical correlation;
-- the subscript $1$ indicates the first canonical correlation;
-- $\max$ means “take the largest possible value”;
-- $a,b$ under $\max$ indicate that CCA searches over possible values of both weight vectors;
-- $\operatorname{corr}(Xa,Yb)$ is the Pearson correlation between the two weighted combinations.
-
 This means:
 
 1. Choose a possible EEG weight vector $a$.
@@ -657,7 +649,393 @@ $$
 \operatorname{corr}(Xa^\ast,Yb^\ast).
 $$
 
----
+
+## What is the algorthm used by CCA?
+
+
+CCA does not literally try every possible value of $a$ and $b$. There are infinitely many possibilities.
+
+Instead, it transforms the optimization problem into a matrix problem that can be solved using **singular value decomposition**, or SVD.
+
+Suppose:
+
+$$
+X\in\mathbb{R}^{n\times p}
+$$
+
+contains the EEG data and:
+
+$$
+Y\in\mathbb{R}^{n\times q}
+$$
+
+contains the fMRI data.
+
+CCA proceeds as follows:
+
+- **Step 1: Center the Variables**
+
+Subtract the mean from every column:
+
+$$
+X_c=X-\bar{X}
+$$
+
+and:
+
+$$
+Y_c=Y-\bar{Y}.
+$$
+
+This is necessary because CCA is interested in how the variables move around their means.
+
+- **Step 2: Calculate the Covariance Matrices**
+
+CCA calculates three covariance matrices.
+
+The covariance matrix within $X$ is:
+
+$$
+\Sigma_{XX}
+=
+\frac{1}{n-1}X_c^\top X_c.
+$$
+
+The covariance matrix within $Y$ is:
+
+$$
+\Sigma_{YY}
+=
+\frac{1}{n-1}Y_c^\top Y_c.
+$$
+
+The cross-covariance matrix between $X$ and $Y$ is:
+
+$$
+\Sigma_{XY}
+=
+\frac{1}{n-1}X_c^\top Y_c.
+$$
+
+These matrices describe:
+
+- how the EEG features vary with one another;
+- how the fMRI features vary with one another;
+- how every EEG feature varies with every fMRI feature.
+
+- **Step 3: Whiten Both Datasets**
+
+CCA wants to compare shared variation without allowing high-variance features to dominate.
+
+It constructs the whitened cross-covariance matrix:
+
+$$
+K
+=
+\Sigma_{XX}^{-1/2}
+\Sigma_{XY}
+\Sigma_{YY}^{-1/2}.
+$$
+
+The terms:
+
+$$
+\Sigma_{XX}^{-1/2}
+$$
+
+and:
+
+$$
+\Sigma_{YY}^{-1/2}
+$$
+
+are the inverse square roots of the covariance matrices.
+
+Whitening has two effects:
+
+1. It rescales each direction to have variance $1$.
+2. It removes correlations among features within the same dataset.
+
+After whitening:
+
+$$
+\operatorname{Cov}(X_{\mathrm{white}})=I
+$$
+
+and:
+
+$$
+\operatorname{Cov}(Y_{\mathrm{white}})=I,
+$$
+
+where $I$ is the identity matrix.
+
+Conceptually, whitening puts both datasets on a comparable scale.
+
+- **Step 4: Apply Singular Value Decomposition**
+
+CCA applies SVD to the whitened cross-covariance matrix:
+
+$$
+K=P D Q^\top.
+$$
+
+The resulting matrices have different roles:
+
+- $P$ contains directions in the whitened $X$ space;
+- $Q$ contains directions in the whitened $Y$ space;
+- $D$ is a diagonal matrix containing the canonical correlations.
+
+The matrix $D$ has the form:
+
+$$
+D=
+\begin{bmatrix}
+\rho_1 & 0 & \cdots\\
+0 & \rho_2 & \cdots\\
+\vdots & \vdots & \ddots
+\end{bmatrix},
+$$
+
+where:
+
+$$
+\rho_1\geq\rho_2\geq\rho_3\geq\cdots.
+$$
+
+The largest singular value, $\rho_1$, is the first and largest canonical correlation.
+
+- **Step 5: Transform the Directions Back Into Weights**
+
+Let $p_1$ be the first column of $P$, and let $q_1$ be the first column of $Q$.
+
+The first pair of CCA weights is:
+
+$$
+a_1
+=
+\Sigma_{XX}^{-1/2}p_1
+$$
+
+and:
+
+$$
+b_1
+=
+\Sigma_{YY}^{-1/2}q_1.
+$$
+
+CCA then constructs the first canonical variables:
+
+$$
+U_1=X_c a_1
+$$
+
+and:
+
+$$
+V_1=Y_c b_1.
+$$
+
+Their correlation is:
+
+$$
+\operatorname{corr}(U_1,V_1)=\rho_1.
+$$
+
+This is the largest possible correlation between any linear combination of $X$ and any linear combination of $Y$.
+
+- **Additional Canonical Components**
+
+The second columns of $P$ and $Q$ give the second pair of weights:
+
+$$
+a_2
+=
+\Sigma_{XX}^{-1/2}p_2
+$$
+
+and:
+
+$$
+b_2
+=
+\Sigma_{YY}^{-1/2}q_2.
+$$
+
+These produce:
+
+$$
+U_2=X_c a_2
+$$
+
+and:
+
+$$
+V_2=Y_c b_2,
+$$
+
+with:
+
+$$
+\operatorname{corr}(U_2,V_2)=\rho_2.
+$$
+
+The second pair captures the strongest remaining shared relationship while remaining uncorrelated with the first pair within each dataset.
+
+The process continues for later components.
+
+- **Why SVD Finds the Maximum**
+
+After whitening, every possible direction has variance $1$. Therefore, CCA no longer needs to separately account for the variances in the correlation denominator.
+
+The problem becomes:
+
+$$
+\max_{\lVert p\rVert=1,\lVert q\rVert=1}
+p^\top Kq.
+$$
+
+The notation:
+
+$$
+\lVert p\rVert=1
+$$
+
+means that the length, or norm, of $p$ is $1$.
+
+Similarly:
+
+$$
+\lVert q\rVert=1
+$$
+
+means that the length of $q$ is $1$.
+
+SVD has the mathematical property that:
+
+$$
+\max_{\lVert p\rVert=1,\lVert q\rVert=1}
+p^\top Kq
+=
+\rho_1.
+$$
+
+The directions that produce this maximum are the first left and right singular vectors:
+
+$$
+p=p_1,
+\qquad
+q=q_1.
+$$
+
+Therefore, SVD gives both:
+
+- the maximum correlation $\rho_1$;
+- the directions that achieve it.
+
+- **Equivalent Eigenvalue Algorithm**
+
+CCA can also be written as an eigenvalue problem:
+
+$$
+\Sigma_{XX}^{-1}
+\Sigma_{XY}
+\Sigma_{YY}^{-1}
+\Sigma_{YX}a
+=
+\rho^2a.
+$$
+
+The largest eigenvalue is:
+
+$$
+\rho_1^2,
+$$
+
+and its eigenvector gives the first $X$-side weight vector.
+
+A similar equation produces $b$:
+
+$$
+\Sigma_{YY}^{-1}
+\Sigma_{YX}
+\Sigma_{XX}^{-1}
+\Sigma_{XY}b
+=
+\rho^2b.
+$$
+
+However, directly calculating matrix inverses is often numerically unstable. Good implementations generally use matrix factorizations rather than explicitly computing the inverses.
+
+- **High-Dimensional Data**
+
+For EEG and fMRI, the number of features may exceed the number of observations:
+
+$$
+p>n
+$$
+
+or:
+
+$$
+q>n.
+$$
+
+In this situation, the covariance matrices are singular and cannot be inverted in the ordinary way.
+
+Regularized CCA replaces the covariance matrices with:
+
+$$
+\Sigma_{XX}^{(\mathrm{reg})}
+=
+\Sigma_{XX}+\lambda_X I
+$$
+
+and:
+
+$$
+\Sigma_{YY}^{(\mathrm{reg})}
+=
+\Sigma_{YY}+\lambda_Y I,
+$$
+
+where:
+
+- $I$ is the identity matrix;
+- $\lambda_X$ is the regularization parameter for $X$;
+- $\lambda_Y$ is the regularization parameter for $Y$.
+
+Regularization makes the matrices invertible and reduces overfitting.
+
+The practical algorithm is therefore:
+
+$$
+\boxed{
+\text{center}
+\rightarrow
+\text{calculate covariances}
+\rightarrow
+\text{regularize}
+\rightarrow
+\text{whiten}
+\rightarrow
+\text{SVD}
+\rightarrow
+\text{recover weights}
+}
+$$
+
+::: {.callout-important}
+For EEG--fMRI data, regularized CCA is generally safer than unregularized CCA because both modalities often contain many features relative to the number of matched time points.
+:::
+
+
+
+
+
+
+
 
 ## 11. Covariance Matrices
 
