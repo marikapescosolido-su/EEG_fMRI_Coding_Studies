@@ -1,0 +1,16 @@
+# CODING CCA ON DATASET ds006033 EEG fMRI innser speech dataset
+
+## Step 1: Set up the coding environment
+
+```{python}
+import mne
+import numpy as np
+
+import matplotlib
+# Force an interactive window backend for Windows/VS Code
+matplotlib.use('TkAgg')
+
+import matplotlib.pyplot as plt
+```
+
+Set up the coding environment by importing the necessary libraries and packages. This includes:
